@@ -1,0 +1,36 @@
+<% include header.ejs %>
+	<div id="StockData">
+		<form action="/insert" method="post" accept-charset="utf-8">
+			<input type="text" id="TickerSymbol" name="証券コード" value="" placeholder="証券コード" required>
+			社名<input type="text" id="company" name="会社名" value="" placeholder="google">
+			決算期<select name="決算期" id="settlement">
+				<option value="2015">2015</option>
+				<option value="2014">2014</option>
+				<option value="2013">2013</option>
+				<option value="2012">2012</option>
+				<option value="2011">2011</option>
+			</select>
+			流動資産<input type="text" id="current_assets" class="bs" name="流動資産" value="200"><!-- 流動資産 -->
+			固定資産<input type="text" id="permanent_assets" class="bs" name="固定資産" value="300"><!-- 固定資産 -->
+			流動負債<input type="text" id="current_liabilities" class="bs" name="流動負債" value="250"><!-- 流動負債 -->
+			固定負債<input type="text" id="fixed_liabilities" class="bs" name="固定負債" value="100"><!-- 固定負債 -->
+			純資産<input type="text" id="net_assets" class="bs" name="純資産" value="150"><!--  純資産 -->
+			売上高<input type="text" id="sales" class="pl" name="売上高" value="500"><!-- 売上高 -->
+			営業利益<input type="text" id="Operating_Profit" class="pl" name="営業利益" value="200"><!-- 営業利益 -->
+			経常利益<input type="text" id="Ordinary_Profit" class="pl" name="経常利益" value="150"><!-- 経常利益 -->
+			当期純利益<input type="text" id="Net_income" class="pl" name="当期純利益" value="50"><br><!-- 当期純利益 -->
+			<input type="submit" name="送信" value="アップロード">
+		</form>
+		<form action="/graph" method="post" accept-charset="utf-8">
+			<input type="text" name="ticker" value="" placeholder="証券コード"><br>
+			<input type="submit" name="graph" value="ビジュアライズ">
+		</form>
+	</div>
+	<% include graph.ejs %>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script type="text/javascript"></script>
+</body>
+</html>
+
+
