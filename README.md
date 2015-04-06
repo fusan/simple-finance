@@ -1,4 +1,4 @@
-# node-js-getting-started
+# simple-finance
 
 A barebones Node.js app using [Express 4](http://expressjs.com/).
 
