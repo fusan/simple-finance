@@ -1,0 +1,43 @@
+header {
+	padding:0 0 0 1%;
+}
+#StockData {
+	padding:1%;
+	background:rgba(0, 0, 0, 0.08);
+	box-shadow:0 0 1px rgba(0, 0, 0, 0.08);
+}
+#titleAni {
+	-webkit-transition: all 1s ease 0 ;
+	opacity:.3;
+}
+#graph {
+	position:relative;
+	left:0px;
+	margin:2% 0;
+	padding: 0;
+	width: auto;
+	height: auto;
+	overflow: scroll;
+	box-shadow:0 0 1px rgba(0, 0, 0, 0.32);
+}
+input {
+	margin:.4em;
+	width:8em;
+}
+.head {
+	margin:4px 0;
+	padding:0 0 0 4px;
+	border-left:4px solid red;
+	color:rgba(0, 0, 0, 0.56);
+	font-weight:bold;
+	text-shadow: 0 0 0 rgba(0, 0, 0, 1) inset;
+}
+
+.axis path, .axis line {
+	fill:none;
+	stroke:gray;
+	shape-rendering: crispEdges;
+}
+.axis text {
+	font-size: .64em;
+}
