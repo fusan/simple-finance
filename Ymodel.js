@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var url = 'mongodb://heroku_app35584595:t7itv7immno45qdjbkkv25cs1@ds061391.mongolab.com:61391/heroku_app35584595/kabu2';
+var url = 'mongodb://heroku_app35584595:t7itv7immno45qdjbkkv25cs1@ds061391.mongolab.com:61391/heroku_app35584595/kabu2';//
 var db = mongoose.createConnection(url, function(err, res) {
 	if(err) {
 		console.log('error connected:' + url + '-' + err);

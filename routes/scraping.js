@@ -15,12 +15,13 @@ var yahoofinance = 'http://profile.yahoo.co.jp/consolidate/';
 exports.scrapeOne = function (req) {
 	var url = yahoofinance + req;
 	//スクレイピング
-	scrape(1,req,url);
+	scrape(req,url);
 }
 
 //全データ取得
-exports.scrapeAll = function (req) {
-	var initial = 1000;
+exports.scrapeAll = function () {
+	console.log('全件取得開始');
+	var initial = 1300;
 	var end = 10000;
 	var promise = new Promise(function(resolve, reject){
 			var urls = [];
@@ -35,7 +36,7 @@ exports.scrapeAll = function (req) {
 
 		promise.then(function(urls){
 			for(var i=0,n=urls.length;i<n;i++) {
-				scrape((end-1), urls[i].ticker,urls[i].url);
+				scrape(urls[i].ticker,urls[i].url);
 			}
 		});
 
@@ -45,114 +46,97 @@ exports.scrapeAll = function (req) {
 	}
 
 //スクレピング　-> 完了通知のための引数　格納データの最大引数と現在の引数がマッチしたら完了通知モジュール
-function scrape(dataLength, currentticker, url) {
-	console.log(dataLength,currentticker);
+function scrape(currentticker, url) {
+	//console.log(url);
 	request({　uri: url },
 		function(err, res, body) {
 		//取得したページのbody部をパース
-		var $ = cheerio.load(body);
+		if(body) {
+			var $ = cheerio.load(body);
+		} else {
+			return;
+		}
+		
 
 		//yahooファイナンスからのスクレイピング
 		Obj = yahooScrape($);
-		
+		//console.log(Obj);
 
-		//jsonファイル出力
 		if(Obj != false) {
-			console.log(Obj);
-		
-		//データベースと照合
-		Yahoo.find({'証券コード': currentticker}, function(err, data) {
-			var ObjSettlement = [];  //スクレピングオブジェクト
-			var dbSettlement = [];   //データベース格納済み
-
-			var Match = new Promise(function(resolve, reject){
-				for(var i=0,n=Obj.length;i<n;i++) {
-					 ObjSettlement.push(Obj[i]['決算期']);
-					}
-				
-				for(var i=0,n=data.length;i<n;i++) {
-					 dbSettlement.push(data[i]['決算期']);
-					}
-
-				//重複データを空文字列に変換
-				for (var i = 0; i < dbSettlement.length; i++) {
-					for (var j = 0; j < ObjSettlement.length; j++) {
-						if(dbSettlement[i] == ObjSettlement[j]) {
-							dbSettlement[i] = '';
-							ObjSettlement[j] = '';
-						}
-					};
-				};
-
-				console.log('スクレイピングデータ: ' + ObjSettlement + ',格納ずみデータ: ' + dbSettlement);
-
-				//更新データの抽出　-> 空文字列を弾く
-				ObjSettlement = ObjSettlement.filter(function(d,i,self) {
-					return d != '' ?  d : console.log('更新データなし');
+		//DB挿入
+		var promise = new Promise(function(resolve,reject) {
+			//console.log(Obj);
+			
+			for (var i=0,n=Obj.length;i<n;i++) {
+				var conditions = {$and: [
+						{"決算期": Obj[i]['決算期']},
+						{"証券コード": Obj[i]['証券コード']}
+					]};
+				var doc = {$set: {
+					"会社名": Obj[i]['会社名'],
+					"証券コード": Obj[i]['証券コード'],
+					'決算期': Obj[i]['決算期'],
+					'会計方式': Obj[i]['会計方式'],
+					'決算発表日': Obj[i]['決算発表日'],
+					'決算月数': Obj[i]['決算月数'],
+					"売上高": Obj[i]['売上高'],
+					'営業利益': Obj[i]['営業利益'],
+					'経常利益': Obj[i]['経常利益'],
+					'当期利益': Obj[i]['当期利益'],
+					'EPS（一株当たり利益）': Obj[i]['EPS（一株当たり利益）'],
+					'調整一株当たり利益': Obj[i]['調整一株当たり利益'],
+					'BPS（一株当たり純資産）': Obj[i]['BPS（一株当たり純資産）'],
+					'総資産': Obj[i]['総資産'],
+					'自己資本': Obj[i]['自己資本'],
+					'資本金': Obj[i]['資本金'],
+					'有利子負債': Obj[i]['有利子負債'],
+					'自己資本比率': Obj[i]['自己資本比率'],
+					'ROA（総資産利益率）': Obj[i]['ROA（総資産利益率）'],
+					'ROE（自己資本利益率）': Obj[i]['ROE（自己資本利益率）'],
+					'総資産経常利益率': Obj[i]['総資産経常利益率']
+					}};
+				var options = {upsert:true};
+				//res.send(req.query);
+				Yahoo.update(conditions, doc, options, function(err, data) {
+					//console.log(data);  //{ ok: 1, nModified: 0, n: 1 }
 				});
-				resolve(ObjSettlement);
-			});
-
-			//データベース格納　-> jsonファイル生成
-			Match.then(function(ObjSettlement) {
-				if(dbSettlement.length == 0) {
-					//データベース無しの場合
-					for (var i = 0; i < Obj.length; i++) {
-						var YDB = new Yahoo(Obj[i]);
-						YDB.save(function(err) {
-							if(err) throw err;
-							Yahoo.find({'証券コード': currentticker}, function(err, data) {
-								JSONFileGenerator(data);
-							});
-						});
-					}
-					if(dataLength == currentticker) {
-						//完了通知　socket.ioを使うしかなにのかな 下記コメントを完了時に通知
-					console.log('コメント「データ格納しました' + ObjSettlement+ '」');
-					}
-				} else {
-					console.log(ObjSettlement[0]);
-					//格納済みデータがある場合
-					for (var i = 0; i < Obj.length; i++) {
-						//更新データのみ格納
-						if(Obj[i]['決算期'] == ObjSettlement[0]) {
-							var YDB = new Yahoo(Obj[i]);
-							YDB.save(function(err) {
-							    if(err) throw err;
-							    Yahoo.find({'証券コード': currentticker}, function(err, data) {
-									JSONFileGenerator(data);
-							   		});
-								});
-							}
-						}
-					if(dataLength == currentticker) {
-						//完了通知　socket.ioを使うしかなにのかな 下記コメントを完了時に通知
-						console.log('コメント「データ格納しました' + ObjSettlement[0] + '」');
-					}
 				}
+				resolve('ok');
+			
+		});
+		
+		//jsonファイル出力
+		promise.then(function(value){
+			Yahoo.find({"証券コード": currentticker}, function(err, data) {
+				JSONFileGenerator(data);
+				//console.log(data);
 			});
+		});
 
-			Match.catch(function(err) {
-					console.log(new ERROR(err));
-				});	
-			});	
-			}
+		promise.catch(function(err) {
+			console.log(err);
+		});
 		}
+	}
 	);
 }
 
 //jsonfile生成
-function JSONFileGenerator(Obj) {
-	//console.log(Obj);
-	if(Obj != false) {
-		console.log('checking');
-		console.log(Obj[0]['証券コード']);
-		fs.writeFile('./json/' + Obj[0]['証券コード'] + '.json', JSON.stringify(Obj), 'utf8', function(err) {
-			fs.readFile('./json/' + Obj[0]['証券コード'] + '.json','utf8', function(err, data) {
-				//if(!undefined) {console.log(JSON.parse(data));}　-> error: end of input
+function JSONFileGenerator(data) {
+
+		var jsons = [];
+		for (var i=0,n=data.length;i<n;i++) {
+			jsons.push(data[i]);
+		}
+
+		//if(jsons[0]['証券コード'] != undefined) {
+			fs.writeFile('./json/' + data['証券コード'] + '.json', JSON.stringify(jsons), 'utf8', function(err) {
+				fs.readFile('./json/' + data['証券コード'] + '.json','utf8', function(err, data) {
+					//console.log(data);
+				});
 			});
-		});
-	}
+		//}
+		
 }
 
 //yahooファイナンス専用　DOM取得　＝＞　JSON出力
@@ -160,6 +144,7 @@ function yahooScrape($) {
 	var company = $('.yjL').text();
 	var ticker = company.slice(-5,-1);
 	var settlementcheck = $('#right_col').find('table').eq(1).find('tr').eq(1).find('td').eq(1).text();
+	//console.log(company);
 
 	if(company == '企業情報ページが見つかりません' || settlementcheck == '---') {
 		return false ;
@@ -190,6 +175,7 @@ function yahooScrape($) {
 		var lastObj = [];
 		lastObj.push(Obj[0],Obj[1],Obj[2],Obj[3]);
 		lastObj = ArrayToJson(lastObj);
+		console.log(lastObj);
 		return lastObj;
 	}
 }
