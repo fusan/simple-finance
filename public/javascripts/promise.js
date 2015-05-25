@@ -1,4 +1,12 @@
 $(function(){
+	$('#test').on('click', function() {
+		$.ajax({
+			url: '/test',
+			type: 'GET'
+		}).done(function(data) {
+			console.log(data);
+		});
+	});
 	//グラフエリアの移動
 		$('#data').on(
 				'mousedown','.graph', function(e) {
@@ -46,7 +54,7 @@ $(function(){
 	var now = new Date().getHours();					//現在時刻 -> テストする際はinitialTimeの７日後を指定する。
 	console.log(now - initialTime,now, initialTime);
 
-	if ((now - initialTime) == 0)　{//テストの際は　条件式にtrueに
+	if (true)　{//テストの際は　条件式にtrueに (now - initialTime) == 0
 		//通知
 		console.log('更新作業');
 		$('#input').parent().append('<span id="update">更新開始</span>')

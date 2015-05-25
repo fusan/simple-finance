@@ -20,7 +20,7 @@ exports.scrapeOne = function (req) {
 
 //全データ取得
 exports.scrapeAll = function () {
-	console.log('全件取得開始');
+	//console.log('全件取得開始');
 	var initial = 1300;
 	var end = 10000;
 	var promise = new Promise(function(resolve, reject){
@@ -47,25 +47,26 @@ exports.scrapeAll = function () {
 
 //スクレピング　-> 完了通知のための引数　格納データの最大引数と現在の引数がマッチしたら完了通知モジュール
 function scrape(currentticker, url) {
-	//console.log(url);
+	console.log(url,currentticker);
 	request({　uri: url },
 		function(err, res, body) {
-		//取得したページのbody部をパース
-		if(body) {
-			var $ = cheerio.load(body);
-		} else {
-			return;
-		}
 		
-
-		//yahooファイナンスからのスクレイピング
-		Obj = yahooScrape($);
-		//console.log(Obj);
-
-		if(Obj != false) {
 		//DB挿入
 		var promise = new Promise(function(resolve,reject) {
 			//console.log(Obj);
+			//取得したページのbody部をパース
+			if(body) {
+				var $ = cheerio.load(body);
+			} else {
+				return;
+			}
+			
+
+			//yahooファイナンスからのスクレイピング
+			Obj = yahooScrape($);
+			//console.log(Obj);
+
+			if(Obj != false) {
 			
 			for (var i=0,n=Obj.length;i<n;i++) {
 				var conditions = {$and: [
@@ -101,42 +102,47 @@ function scrape(currentticker, url) {
 					//console.log(data);  //{ ok: 1, nModified: 0, n: 1 }
 				});
 				}
-				resolve('ok');
-			
+			}
+			resolve('ok');
 		});
 		
 		//jsonファイル出力
 		promise.then(function(value){
 			Yahoo.find({"証券コード": currentticker}, function(err, data) {
+				//console.log(data); //jsonファイル生成前のデータの確認
 				JSONFileGenerator(data);
-				//console.log(data);
 			});
 		});
 
 		promise.catch(function(err) {
 			console.log(err);
 		});
-		}
-	}
-	);
+		//}
+	});
 }
 
 //jsonfile生成
 function JSONFileGenerator(data) {
-
+	var promise = new Promise(function(resolve,reject) {
 		var jsons = [];
 		for (var i=0,n=data.length;i<n;i++) {
 			jsons.push(data[i]);
 		}
 
-		//if(jsons[0]['証券コード'] != undefined) {
-			fs.writeFile('./json/' + data['証券コード'] + '.json', JSON.stringify(jsons), 'utf8', function(err) {
-				fs.readFile('./json/' + data['証券コード'] + '.json','utf8', function(err, data) {
-					//console.log(data);
-				});
+		if(jsons.length > 2) {
+			console.log(jsons);
+			resolve(jsons);
+		}
+	});
+
+	promise.then(function(value) {
+		//console.log(value[0]);
+		fs.writeFile('./json/' + value[0]['証券コード'] + '.json', JSON.stringify(value), 'utf8', function(err) {
+			fs.readFile('./json/' + value[0]['証券コード'] + '.json','utf8', function(err, data) {
+				//console.log(data);
 			});
-		//}
-		
+		});
+	});
 }
 
 //yahooファイナンス専用　DOM取得　＝＞　JSON出力
@@ -175,7 +181,7 @@ function yahooScrape($) {
 		var lastObj = [];
 		lastObj.push(Obj[0],Obj[1],Obj[2],Obj[3]);
 		lastObj = ArrayToJson(lastObj);
-		console.log(lastObj);
+		//console.log(lastObj);
 		return lastObj;
 	}
 }
