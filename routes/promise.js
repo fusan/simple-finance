@@ -57,7 +57,7 @@ router.get('/YFtoDB', function(req,res) {
 		console.log(cookie);
 	} else {
 		scraping.scrapeOne(req.query.ticker);
-		res.cookie('update', '個別', {maxAge: 60000});　//本番は60000 * 60 * 24
+		res.cookie('update', '個別', {maxAge: 1000 * 60 * 60 * 24});
 	}
 	res.render('promise', {title: 'Yahoo Scraping!', graph: '',input: ''});
 });
@@ -65,34 +65,38 @@ router.get('/YFtoDB', function(req,res) {
 /* 全データ取得 */
 router.get('/YFtoDBtoAll', function(req,res) {
 	var cookie = req.cookies.update;
+
 	if(cookie == '個別') {
 		console.log(cookie);
+		res.send('not scraping!');
 	} else {
 		scraping.scrapeAll();// 重複データはscrapeing.jsで処理
-		res.cookie('update', '個別', {maxAge: 60000});　//本番は60000 * 60 * 24
+		res.cookie('update', '個別', {maxAge: 1000 * 60 * 60 * 24});
+		res.send('start scraping!');
 	}
-	//同期処理で完了のプッシュを返す
-	res.send('start');
-	//res.render('promise', {title: 'Yahoo Scraping!', graph: 'データベース挿入完了',input: ''})
-	});
+});
 
 /* D３描画 */
 router.post('/visualize', function(req, res) {
-	console.log(req.body.ticker);
+	//console.log(req.body.ticker);
+
 	//DB呼び出し
 	Yahoo.find({'証券コード': req.body.ticker}, function(err, data) {
-		console.log(data.length);
+		//console.log(data.length);
+
 		//d３モジュールに渡す数値の成形
 		if(data != '') {
 			var company = data[0]['会社名'];
-			var settlement = [];//決算期
-			var dataSet = [];//数値
-			var settlementItem = req.body.keyName;//売上高、利益、ROE....
+			var settlement = [];	//決算期
+			var dataSet = [];		//数値
+			var settlementItem = req.body.keyName;		//売上高、利益、ROE....
+
 			for(var i=0,n=data.length;i<n;i++) {
 				dataSet.push(data[i][settlementItem]);
 				settlement.push(data[i]['決算期']);
 			}
 		}
+		
     	var EmptyCaution = '<div id="caution">押してください</div>';
 
     	/* visualize */

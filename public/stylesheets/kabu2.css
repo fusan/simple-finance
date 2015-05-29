@@ -98,3 +98,10 @@ input {
 	width: auto;
 	border-left: 4px solid green;
 	fill: gray;}
+
+#explain,#scrapeOne {
+	margin: 0 1rem 0 0;
+	float: right;
+	-webkit-transform:translate(0,-5px);
+}
+

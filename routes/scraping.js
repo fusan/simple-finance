@@ -27,8 +27,8 @@ exports.scrapeAll = function () {
 			var urls = [];
 			for(var i=initial;i<end;i++) {
 				var url = {};
-				url.url = yahoofinance + i; //url
-				url.ticker = i; //証券コード
+				url.url = yahoofinance + i; //URL
+				url.ticker = i;				//証券コード
 				urls.push(url)
 			}
 			resolve(urls);
@@ -61,46 +61,44 @@ function scrape(currentticker, url) {
 				return;
 			}
 			
-
-			//yahooファイナンスからのスクレイピング
+			//yahooファイナンスからのスクレイピング　別のサイトのスクレイピングをするときはyahooScrape()を別なものにすれば良い。
 			Obj = yahooScrape($);
-			//console.log(Obj);
 
 			if(Obj != false) {
-			
-			for (var i=0,n=Obj.length;i<n;i++) {
-				var conditions = {$and: [
-						{"決算期": Obj[i]['決算期']},
-						{"証券コード": Obj[i]['証券コード']}
-					]};
-				var doc = {$set: {
-					"会社名": Obj[i]['会社名'],
-					"証券コード": Obj[i]['証券コード'],
-					'決算期': Obj[i]['決算期'],
-					'会計方式': Obj[i]['会計方式'],
-					'決算発表日': Obj[i]['決算発表日'],
-					'決算月数': Obj[i]['決算月数'],
-					"売上高": Obj[i]['売上高'],
-					'営業利益': Obj[i]['営業利益'],
-					'経常利益': Obj[i]['経常利益'],
-					'当期利益': Obj[i]['当期利益'],
-					'EPS（一株当たり利益）': Obj[i]['EPS（一株当たり利益）'],
-					'調整一株当たり利益': Obj[i]['調整一株当たり利益'],
-					'BPS（一株当たり純資産）': Obj[i]['BPS（一株当たり純資産）'],
-					'総資産': Obj[i]['総資産'],
-					'自己資本': Obj[i]['自己資本'],
-					'資本金': Obj[i]['資本金'],
-					'有利子負債': Obj[i]['有利子負債'],
-					'自己資本比率': Obj[i]['自己資本比率'],
-					'ROA（総資産利益率）': Obj[i]['ROA（総資産利益率）'],
-					'ROE（自己資本利益率）': Obj[i]['ROE（自己資本利益率）'],
-					'総資産経常利益率': Obj[i]['総資産経常利益率']
-					}};
-				var options = {upsert:true};
-				//res.send(req.query);
-				Yahoo.update(conditions, doc, options, function(err, data) {
-					//console.log(data);  //{ ok: 1, nModified: 0, n: 1 }
-				});
+				for (var i=0,n=Obj.length;i<n;i++) {
+					var conditions = {$and: [
+							{"決算期": Obj[i]['決算期']},
+							{"証券コード": Obj[i]['証券コード']}
+						]};
+					var doc = {$set: {
+						"会社名": Obj[i]['会社名'],
+						"証券コード": Obj[i]['証券コード'],
+						'決算期': Obj[i]['決算期'],
+						'会計方式': Obj[i]['会計方式'],
+						'決算発表日': Obj[i]['決算発表日'],
+						'決算月数': Obj[i]['決算月数'],
+						"売上高": Obj[i]['売上高'],
+						'営業利益': Obj[i]['営業利益'],
+						'経常利益': Obj[i]['経常利益'],
+						'当期利益': Obj[i]['当期利益'],
+						'EPS（一株当たり利益）': Obj[i]['EPS（一株当たり利益）'],
+						'調整一株当たり利益': Obj[i]['調整一株当たり利益'],
+						'BPS（一株当たり純資産）': Obj[i]['BPS（一株当たり純資産）'],
+						'総資産': Obj[i]['総資産'],
+						'自己資本': Obj[i]['自己資本'],
+						'資本金': Obj[i]['資本金'],
+						'有利子負債': Obj[i]['有利子負債'],
+						'自己資本比率': Obj[i]['自己資本比率'],
+						'ROA（総資産利益率）': Obj[i]['ROA（総資産利益率）'],
+						'ROE（自己資本利益率）': Obj[i]['ROE（自己資本利益率）'],
+						'総資産経常利益率': Obj[i]['総資産経常利益率']
+						}};
+					var options = {upsert:true};
+
+					//データベース格納
+					Yahoo.update(conditions, doc, options, function(err, data) {
+						//console.log(data);  //{ ok: 1, nModified: 0, n: 1 }
+					});
 				}
 			}
 			resolve('ok');
@@ -109,7 +107,7 @@ function scrape(currentticker, url) {
 		//jsonファイル出力
 		promise.then(function(value){
 			Yahoo.find({"証券コード": currentticker}, function(err, data) {
-				//console.log(data); //jsonファイル生成前のデータの確認
+				//console.log(data); 		//jsonファイル生成前のデータの確認
 				JSONFileGenerator(data);
 			});
 		});
@@ -117,7 +115,6 @@ function scrape(currentticker, url) {
 		promise.catch(function(err) {
 			console.log(err);
 		});
-		//}
 	});
 }
 

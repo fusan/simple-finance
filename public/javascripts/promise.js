@@ -1,69 +1,36 @@
 $(function(){
-	$('#test').on('click', function() {
-		$.ajax({
-			url: '/test',
-			type: 'GET'
-		}).done(function(data) {
-			console.log(data);
-		});
-	});
-	//グラフエリアの移動
-		$('#data').on(
-				'mousedown','.graph', function(e) {
-					this.initX = parseInt($(this).css('margin-left'));
-					this.startX = e.pageX;
-					this.initY = parseInt($(this).css('margin-top'));
-					this.startY = e.pageY;
-					$(this).on('mousemove', function(e) {
-						this.moveX = this.startX -e.pageX;
-						this.currentX = this.initX - this.moveX;
-						this.moveY = this.startY -e.pageY;
-						this.currentY = this.initY - this.moveY;
-						$(this).css({'margin-left': this.currentX, 'margin-top': this.currentY});
-					});
-				})
-				.on('mouseup','.graph', function(e) {
-					$(this).off('mousemove');
-					$(this).css({'margin-left': this.currentX, 'margin-top': this.currentY});
-				})
-				.on('mouseenter', '.graph', function(e) {
-					$(this).css({cursor: 'move'});
-					//console.log('enter' + e.pageX);
-					$(this).on('mousedown', function(){
-						$(this).css({cursor: 'move'});
-					});
-				});
-	//データフォーム
-	$('#scrapeOne').on('click', function() {
-		if($('#dataInput').css('margin-top') == '0px') {
-			$('#dataInput').animate({
-				'margin-top': '10px',
-				height: '30px'
-			},600,'easeOutQuart');
-		} else {
-			$('#dataInput').animate({
-				'margin-top': 0,
-				height: 0
-			});
-		}
-	});
-	
-
+	if(window.Notification) {
+		console.log('ok');
+	}
 	//更新処理　-> 毎日更新　-> 更新があればプッシュ通知する。　証券番号を表示
 	var initialTime = new Date(2015,1,3,1).getHours();	//基準日時　2015/1/3/2:00
-	var now = new Date().getHours();					//現在時刻 -> テストする際はinitialTimeの７日後を指定する。
-	console.log(now - initialTime,now, initialTime);
+	var now = new Date().getHours();				//現在時刻 -> テストする際はinitialTimeの７日後を指定する。
+	var diff = now - initialTime;
 
-	if ((now - initialTime) == 0)　{//テストの際は　条件式にtrueに (now - initialTime) == 0
-		//通知
-		console.log('更新作業');
-		$('#input').parent().append('<span id="update">更新開始</span>')
-		push();
-		function push() {
-			$('#update').css({
+	if( diff == 0) { diff = true; }
+
+	console.log(diff, now, initialTime);
+
+	if(diff)　{//テストの際は　条件式にtrueに diff == 0			
+		var getYahoo = $.ajax({
+				url: '/YFtoDBtoAll',
+				type: 'GET'
+			});
+
+		getYahoo.done(function(data) {
+			console.log(data);
+			if(data != 'not scraping!') { updateCaution(); }
+		});
+	}
+
+	//更新作業の通知
+	function updateCaution() {
+		$('#input').parent().append('<span id="update">更新開始</span>'); 
+
+		$('#update').css({
 				position: 'fixed',
 				top: 10,
-				left: $('#explain').offset().left,
+				left: $('#explain').offset().left - 10 ,
 				width: 100,
 				height: 30,
 				color: 'red',
@@ -76,43 +43,94 @@ $(function(){
 				opacity: 0
 			},1600, 'swing');
 		}
-			
-		//データベース更新作業
-		var getYahoo = $.ajax({
-				url: '/YFtoDBtoAll',
-				type: 'GET'
+
+	//グラフエリアの移動
+	$('#data').on(
+		'mousedown','.graph', function(e) {
+			this.initX = parseInt($(this).css('margin-left'));
+			this.startX = e.pageX;
+			this.initY = parseInt($(this).css('margin-top'));
+			this.startY = e.pageY;
+			$(this).on('mousemove', function(e) {
+				this.moveX = this.startX -e.pageX;
+				this.currentX = this.initX - this.moveX;
+				this.moveY = this.startY -e.pageY;
+				this.currentY = this.initY - this.moveY;
+				$(this).css({'margin-left': this.currentX, 'margin-top': this.currentY});
 			});
-		getYahoo.done(function(data) {
-			console.log(this.xhr);
-			console.log(data);
+		})
+		.on('mouseup','.graph', function(e) {
+			$(this).off('mousemove');
+			$(this).css({'margin-left': this.currentX, 'margin-top': this.currentY});
+		})
+		.on('mouseenter', '.graph', function(e) {
+			$(this).css({cursor: 'move'});
+			//console.log('enter' + e.pageX);
+			$(this).on('mousedown', function(){
+				$(this).css({cursor: 'move'});
+			});
 		});
-	}
-	
-	
-	//解説書 -> ヒント集
-	$('#explain').on('click', function() {//上から降りてくるアニメーション　を加える。
-		if($('#explainContent').length == 0) {
-			$(this).parent().append('<div id="explainContent">解説です。</div>');
-			$('#explainContent').css({
-				position: 'fixed',
-				top: 0,
-				left: $('#explain').offset().left + $('#explain').width(),
-				padding: 4,
-				width: 400,
-				height: 200,
-				'box-shadow': '0 0 1px gray',
-				background: 'white'
-			}).animate({
-				top: $('#explain').offset().top + $('#explain').height()
-			},200,'swing');
-			console.log('解説表示');
-		} else {
-			$('#explainContent').fadeOut(500);
-			setTimeout(function() {
-				$('#explainContent').remove();
-			},550);
+
+	//個別データ格納
+	$('#scrapeOne').on({
+		'click': function() {
+			var $dataInput = $('#dataInput');
+			if($dataInput.css('margin-top') == '0px') {
+				$dataInput.animate({
+					'margin-top': '10px',
+					height: '30px'
+				},600,'easeOutQuart');
+			} else {
+				$dataInput.animate({
+					'margin-top': 0,
+					height: 0
+				});
+			}
+		},
+		'mouseenter': function() {
+			$(this).attr('src','./images/icon_plus_alt.svg');
+		},
+		'mouseleave': function() {
+			$(this).attr('src','./images/icon_plus_alt2.svg');
 		}
-	});
+	});	
+	
+	//取説のフェイドイン
+	$('#explain').on({
+		'click': function() {//上から降りてくるアニメーション　を加える。
+				var contentWidth = 400;
+				var $explain = $('#explain');
+		
+				if($('#explainContent').length == 0) {
+		
+					$(this).parent().append('<div id="explainContent">解説です。</div>');
+		
+					$('#explainContent').css({
+						position: 'fixed',
+						top: 0,
+						left: $explain.offset().left - contentWidth,
+						padding: 4,
+						width: contentWidth,
+						height: 200,
+						'box-shadow': '0 0 1px gray',
+						background: 'white'
+					}).animate({
+						top: $explain.offset().top + $explain.height()
+					},200,'swing');
+				} else {
+					$('#explainContent').fadeOut(500);
+					setTimeout(function() {
+						$('#explainContent').remove();
+					},550);
+				}
+			},
+		'mouseenter': function() {
+			$(this).attr('src','./images/icon_question_alt.svg');
+		},
+		'mouseleave': function() {
+			$(this).attr('src','./images/icon_question_alt2.svg');
+		}
+		});
 
 	//グラフ選択
 	var compare = [];
@@ -131,17 +149,18 @@ $(function(){
 			$('#caution').css({
 				position: 'absolute',
 				top: $selectData.offset().top,
-				left:$selectData.offset().left + $selectData.width(),
-				width:$selectData.width()
+				left: $selectData.offset().left + $selectData.width(),
+				width: $selectData.width()
 			});
 		});
 
 		//tooltip
-		var tooltipData = [{JQ: '#alldata', text:'全データをデータベースに' },
-							{JQ: '#selectData', text:'４桁のコード' },
-							{JQ: '#visualize', text:'データベースチェック用です'},
-							{JQ: '#analytics', text: 'ROEを解析します。'}
-							];
+		var tooltipData = [
+			{JQ: '#erase', text: 'データ削除'},
+			{JQ: '#selectData', text:'４桁のコード' },
+			{JQ: '#visualize', text:'データベースチェック用です'},
+			{JQ: '#analytics', text: 'ROEを解析します。'},
+			{JQ: '#scrapeOne', text: '個別にスクレイピンング'}];
 
 		for(var i=0,n=tooltipData.length;i<n;i++) {
 			tooltip(tooltipData[i].JQ,tooltipData[i].text);
@@ -150,13 +169,13 @@ $(function(){
 		function tooltip(JQ,text) {
 			$(JQ).on({
 			'mouseenter': function(e) {
-				
+				console.log(text);
 				$(this).parent().append('<span id="tooltip">'+ text +'</span>');
 				$('#tooltip').css({
 					opacity: 0,
 					position:'relative',
 					top: '.5rem',
-					left: 0,
+					left: $(this).css('left'),
 					width:'auto',
 					height: '1rem',
 					color: 'black',
@@ -167,7 +186,7 @@ $(function(){
 					opacity: 1,
 					position:'relative',
 					top: 0,
-					left: 0,
+					left: $(this).css('left'),
 					border: '1px solid black'
 				},500);
 			},
