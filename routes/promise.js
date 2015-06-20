@@ -16,10 +16,33 @@ var model = require('../model.js');
 var model = require('../Ymodel.js');
 	Yahoo = model.Yahoo;
 
+//サーバーが起動していれば毎日更新
+/*
+function update() {
+	scraping.scrapeAll();
+
+	fs.writeFile('./json/update.txt',new Date(),'utf8', function(err) {
+		fs.readFile('./json/update.txt','utf8', function(err, data) {
+			console.log(data);
+		});
+	})
+	setTimeout(update,1000 * 60 * 60 * 24);
+}
+update();
+*/
+
 // GET root
 router.get('/', function(req, res) {
+	//if( new Date().getHours() === 1 ) { scraping.scrapeAll(); } //ルートにアクセスしたときが１時なら毎日１時に更新 
 	res.render('promise',{title: 'Yahoo Scraping!', graph: '',input: ''});
-	});
+});
+
+//更新日時をチェック
+router.get('/check', function(eq, res) {
+	fs.readFile('./json/update.json', 'utf8', function(err, data) {
+		res.send(data);
+	})
+})
 
 router.get('/:id(\\d+)', function(req, res){
 	console.log(req.params.id);
@@ -62,7 +85,7 @@ router.get('/YFtoDB', function(req,res) {
 	res.render('promise', {title: 'Yahoo Scraping!', graph: '',input: ''});
 });
 
-/* 全データ取得 */
+/* 全データ取得 
 router.get('/YFtoDBtoAll', function(req,res) {
 	var cookie = req.cookies.update;
 
@@ -74,7 +97,7 @@ router.get('/YFtoDBtoAll', function(req,res) {
 		res.cookie('update', '個別', {maxAge: 1000 * 60 * 60 * 24});
 		res.send('start scraping!');
 	}
-});
+}); */
 
 /* D３描画 */
 router.post('/visualize', function(req, res) {

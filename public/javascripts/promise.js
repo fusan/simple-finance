@@ -2,6 +2,19 @@ $(function(){
 	if(window.Notification) {
 		console.log('ok');
 	}
+
+	function updateCheck() {
+		$.ajax({
+			url: '/check',
+			type: 'GET'
+		}).done(function(data) {
+			console.log(data);
+			//更新日時をページに埋め込む　html()
+		})
+	}
+	updateCheck();
+
+	/* クライアント更新処理
 	//更新処理　-> 毎日更新　-> 更新があればプッシュ通知する。　証券番号を表示
 	var initialTime = new Date(2015,1,3,1).getHours();	//基準日時　2015/1/3/2:00
 	var now = new Date().getHours();				//現在時刻 -> テストする際はinitialTimeの７日後を指定する。
@@ -43,6 +56,7 @@ $(function(){
 				opacity: 0
 			},1600, 'swing');
 		}
+	*/
 
 	//グラフエリアの移動
 	$('#data').on(
@@ -86,12 +100,6 @@ $(function(){
 					height: 0
 				});
 			}
-		},
-		'mouseenter': function() {
-			$(this).attr('src','./images/icon_plus_alt.svg');
-		},
-		'mouseleave': function() {
-			$(this).attr('src','./images/icon_plus_alt2.svg');
 		}
 	});	
 	
@@ -123,13 +131,7 @@ $(function(){
 						$('#explainContent').remove();
 					},550);
 				}
-			},
-		'mouseenter': function() {
-			$(this).attr('src','./images/icon_question_alt.svg');
-		},
-		'mouseleave': function() {
-			$(this).attr('src','./images/icon_question_alt2.svg');
-		}
+			}
 		});
 
 	//グラフ選択
