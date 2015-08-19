@@ -33,7 +33,7 @@ update();
 
 // GET root
 router.get('/', function(req, res) {
-	//if( new Date().getHours() === 1 ) { scraping.scrapeAll(); } //ルートにアクセスしたときが１時なら毎日１時に更新 
+	//if( new Date().getHours() === 1 ) { scraping.scrapeAll(); } //ルートにアクセスしたときが１時なら毎日１時に更新
 	res.render('promise',{title: 'Yahoo Scraping!', graph: '',input: ''});
 });
 
@@ -41,8 +41,8 @@ router.get('/', function(req, res) {
 router.get('/check', function(eq, res) {
 	fs.readFile('./json/update.json', 'utf8', function(err, data) {
 		res.send(data);
-	})
-})
+	});
+});
 
 router.get('/:id(\\d+)', function(req, res){
 	console.log(req.params.id);
@@ -67,7 +67,7 @@ router.get('/analytics', function(req, res) {
 				ROEArray['決算期'] =  data[i]['決算期'];
 				ROEArray['証券コード'] = data[i]['証券コード'];
 			ROEArrays.push(ROEArray);
-			}	
+			}
 		console.log(data.length);
 		res.send(ROEArrays);
 	});
@@ -85,7 +85,7 @@ router.get('/YFtoDB', function(req,res) {
 	res.render('promise', {title: 'Yahoo Scraping!', graph: '',input: ''});
 });
 
-/* 全データ取得 
+/* 全データ取得
 router.get('/YFtoDBtoAll', function(req,res) {
 	var cookie = req.cookies.update;
 
@@ -108,7 +108,7 @@ router.post('/visualize', function(req, res) {
 		//console.log(data.length);
 
 		//d３モジュールに渡す数値の成形
-		if(data != '') {
+		if(data !== '') {
 			var company = data[0]['会社名'];
 			var settlement = [];	//決算期
 			var dataSet = [];		//数値
@@ -119,11 +119,11 @@ router.post('/visualize', function(req, res) {
 				settlement.push(data[i]['決算期']);
 			}
 		}
-		
+
     	var EmptyCaution = '<div id="caution">押してください</div>';
 
     	/* visualize */
-    	if(data == '') {
+    	if(data === '') {
 	    		res.render('promise', {title: 'Yahoo Scraping!', graph: EmptyCaution, input: req.body.ticker});
 	    	} else {
 	    		visualize.jsdom(settlementItem,settlement,dataSet,company,req,res);

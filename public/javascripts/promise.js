@@ -10,7 +10,7 @@ $(function(){
 		}).done(function(data) {
 			console.log(data);
 			//更新日時をページに埋め込む　html()
-		})
+		});
 	}
 	updateCheck();
 
@@ -24,7 +24,7 @@ $(function(){
 
 	console.log(diff, now, initialTime);
 
-	if(diff)　{//テストの際は　条件式にtrueに diff == 0			
+	if(diff)　{//テストの際は　条件式にtrueに diff == 0
 		var getYahoo = $.ajax({
 				url: '/YFtoDBtoAll',
 				type: 'GET'
@@ -38,7 +38,7 @@ $(function(){
 
 	//更新作業の通知
 	function updateCaution() {
-		$('#input').parent().append('<span id="update">更新開始</span>'); 
+		$('#input').parent().append('<span id="update">更新開始</span>');
 
 		$('#update').css({
 				position: 'fixed',
@@ -50,7 +50,7 @@ $(function(){
 				'font-size': 12,
 				opacity: 0.3
 			}).animate({
-				opacity: 1 
+				opacity: 1
 			},1600, 'swing')
 			.animate({
 				opacity: 0
@@ -59,6 +59,7 @@ $(function(){
 	*/
 
 	//グラフエリアの移動
+	/*
 	$('#data').on(
 		'mousedown','.graph', function(e) {
 			this.initX = parseInt($(this).css('margin-left'));
@@ -83,7 +84,7 @@ $(function(){
 			$(this).on('mousedown', function(){
 				$(this).css({cursor: 'move'});
 			});
-		});
+		});*/
 
 	//個別データ格納
 	$('#scrapeOne').on({
@@ -101,18 +102,18 @@ $(function(){
 				});
 			}
 		}
-	});	
-	
+	});
+
 	//取説のフェイドイン
 	$('#explain').on({
 		'click': function() {//上から降りてくるアニメーション　を加える。
 				var contentWidth = 400;
 				var $explain = $('#explain');
-		
-				if($('#explainContent').length == 0) {
-		
+
+				if($('#explainContent').length === 0) {
+
 					$(this).parent().append('<div id="explainContent">解説です。</div>');
-		
+
 					$('#explainContent').css({
 						position: 'fixed',
 						top: 0,
@@ -182,7 +183,7 @@ $(function(){
 					height: '1rem',
 					color: 'black',
 					'font-size': '.5rem',
-					
+
 				}).
 				animate({
 					opacity: 1,
@@ -227,9 +228,9 @@ $(function(){
 			detailChart.done(function(data) {
 				for(var i=0,n=data.length;i<n;i++) {
 					ROE = {};//積極的に　上手に経営しているので　結果に繋がってるいう　そうゆう指標ってことかぬ
-					ROE['売上高利益率'] = data[i]['当期利益'] / data[i]['売上高']//売上高利益率　上手くやってるぬ
-					ROE['総資産回転率'] = data[i]['売上高'] / data[i]['総資産']//総資産回転率　結果に繋がってるね
-					ROE['財務レバレッジ'] = data[i]['総資産']　/ data[i]['自己資本']//財務レバレッジ　積極的ね　
+					ROE['売上高利益率'] = data[i]['当期利益'] / data[i]['売上高'];//売上高利益率　上手くやってるぬ
+					ROE['総資産回転率'] = data[i]['売上高'] / data[i]['総資産'];//総資産回転率　結果に繋がってるね
+					ROE['財務レバレッジ'] = data[i]['総資産']　/ data[i]['自己資本'];//財務レバレッジ　積極的ね　
 					ROE['決算期'] = data[i]['決算期'];
 					ROE['自己資本比率'] =  data[i]['自己資本比率'];
 					ROE['自己資本'] =  data[i]['自己資本'];
@@ -243,13 +244,13 @@ $(function(){
 
 			//d３生成
 			detailChart.done(function(data) {
-				
+
 				ROEarray = ROEarray.sort(function(a,b) {
 					var asettlment = a['決算期'];
 					var bsettlment = b['決算期'];
 					if( asettlment < bsettlment ) return -1;
 					if( asettlment > bsettlment ) return 1;
-					return 0;   
+					return 0;
 				});
 
 				console.log(ROEarray);
@@ -258,7 +259,7 @@ $(function(){
 
 				var padding = 40;
 				var barWidth = 100;
-				var scale = .135;
+				var scale = 0.135;
 				var fontSize = 9;
 				var svgHeight = 350;
 
@@ -270,7 +271,7 @@ $(function(){
 							width: '100%',
 							height: svgHeight,
 							class: 'graph'
-						})
+						});
 
 				erase(ROE,ROEarray);
 
@@ -294,7 +295,7 @@ $(function(){
 					.text(function(d,i) {
 						console.log(d);
 						return '当期利益　' + d['当期利益'];
-					})
+					});
 
 				ROE.selectAll('netIncome')
 					.data(ROEarray)
@@ -320,7 +321,7 @@ $(function(){
 							.attr({
 								fill: 'black',
 								transform: 'translate(0, -' + fontSize + ')'
-							})
+							});
 						},
 						'mouseleave': function() {
 							netIncomeText
@@ -328,11 +329,11 @@ $(function(){
 							.attr({
 								fill: 'none',
 								transform: 'translate(0,0)'
-							})
+							});
 						}
-					})
+					});
 
-					
+
 				//売上高
 				ROE.selectAll('sales')
 					.data(ROEarray)
@@ -350,7 +351,7 @@ $(function(){
 							return d['売上高'] * Math.pow(scale, 4) ;
 						},
 						fill: 'rgba(0,0,0,.32)'
-					})
+					});
 
 				ROE.selectAll('salesText')
 					.data(ROEarray)
@@ -372,7 +373,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return '売上高　' + d['売上高'];
-					})
+					});
 
 			//総資産回転率
 				var sales2Text = ROE.selectAll('sales2Text')
@@ -393,7 +394,8 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return '売上高　' + d['売上高'];
-					})
+					});
+
 				ROE.selectAll('sales2')
 					.data(ROEarray)
 					.enter()
@@ -418,7 +420,7 @@ $(function(){
 							.attr({
 								fill: 'black',
 								transform: 'translate(0, -' + fontSize + ')'
-							})
+							});
 						},
 						'mouseleave': function() {
 							sales2Text
@@ -426,9 +428,9 @@ $(function(){
 							.attr({
 								fill: 'none',
 								transform: 'translate(0,0)'
-							})
+							});
 						}
-					})
+					});
 
 				ROE.selectAll('asset')
 					.data(ROEarray)
@@ -446,7 +448,7 @@ $(function(){
 							return d['総資産'] * Math.pow(scale, 4) ;
 						},
 						fill: 'rgba(0,0,0,.32)'
-					})
+					});
 
 				ROE.selectAll('assetText')
 					.data(ROEarray)
@@ -464,7 +466,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return '総資産　' + d['総資産'];
-					})
+					});
 			//財務レバレッジ比率
 				ROE.selectAll('assset')
 					.data(ROEarray)
@@ -482,7 +484,7 @@ $(function(){
 							return d['総資産'] * Math.pow(scale, 4) ;
 						},
 						fill: 'rgba(0,0,20,.16)'
-					})
+					});
 				ROE.selectAll('asset2Text')
 					.data(ROEarray)
 					.enter()
@@ -501,7 +503,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return '総資産　' + d['総資産'];
-					})
+					});
 
 				ROE.selectAll('equity')
 					.data(ROEarray)
@@ -519,7 +521,7 @@ $(function(){
 							return d['自己資本'] * Math.pow(scale, 4) ;
 						},
 						fill: 'rgba(0,0,20,.32)'
-					})
+					});
 				ROE.selectAll('equityText')
 					.data(ROEarray)
 					.enter()
@@ -536,7 +538,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return '自己資本　' + d['自己資本'];
-					})
+					});
 
 				//指標
 				ROE.selectAll('totalAssetTurnoverText')
@@ -555,7 +557,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return '総資産回転率';
-					})
+					});
 				ROE.selectAll('totalAssetTurnoverText')
 					.data(ROEarray)
 					.enter()
@@ -572,7 +574,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return (d['総資産回転率'] * 100).toFixed(2) + '%';
-					})
+					});
 
 				ROE.selectAll('financialLeverageText')
 					.data(ROEarray)
@@ -590,7 +592,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return '財務レバレッジ';
-					})
+					});
 				ROE.selectAll('financialLeverageText')
 					.data(ROEarray)
 					.enter()
@@ -607,7 +609,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return (d['財務レバレッジ'] * 100).toFixed(2) + '%';
-					})
+					});
 
 				ROE.selectAll('netIncomeRtioText')
 					.data(ROEarray)
@@ -627,7 +629,7 @@ $(function(){
 					.text(function(d,i) {
 						console.log(d);
 						return '売上高利益率';
-					})
+					});
 				ROE.selectAll('netIncomeRtioText')
 					.data(ROEarray)
 					.enter()
@@ -646,7 +648,7 @@ $(function(){
 					.text(function(d,i) {
 						console.log(d);
 						return (d['売上高利益率'] * 100).toFixed(2) + '%';
-					})
+					});
 
 				ROE.selectAll('roe')
 					.data(ROEarray)
@@ -662,7 +664,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return 'ROE ' + (d['当期利益']/d['自己資本'] * 100).toFixed(2) + '%';
-					})
+					});
 				ROE.selectAll('settlement')
 					.data(ROEarray)
 					.enter()
@@ -677,7 +679,7 @@ $(function(){
 					})
 					.text(function(d,i) {
 						return d['決算期'];
-					})
+					});
 
 				console.log('完了');
 			});
@@ -689,7 +691,7 @@ $(function(){
 			//合格した配列をランキング
 				//直近のROEの高い順、直近３カ月の成長が高い、＊平均値を算出してブレが大きくない会社を抽出
 
-			//配列内入れるのminとmaxのdiffを取得し用意したオブジェクトに格納sる 
+			//配列内入れるのminとmaxのdiffを取得し用意したオブジェクトに格納sる
 			//var ROE = {}; ROE.range = min - max; ROE.value = [];
 		}
 
@@ -697,10 +699,10 @@ $(function(){
 		function create() {
 				var ticker = document.getElementById('input').value;
 				var manageIndex = document.getElementById('select').value;
-				var fileUrl = '/' + ticker;
+				var url = '/' + ticker;
 
 				var chart = $.ajax({
-					url: fileUrl,
+					url: url,
 					type: 'GET',
 					dataType: 'json'
 				});
@@ -739,8 +741,8 @@ $(function(){
 				for (var i = 0; i < array.length; i++) {
 					dataSet.push(array[i][Title]);
 					settlement.push(array[i]['決算期']);
-				};
-				
+				}
+
 				settlement = settlementCharChange(settlement);//月　→　／
 					//console.log(dataSet);
 				dataSet = StringToNumber(dataSet);
@@ -870,14 +872,14 @@ $(function(){
 								width:dataSet.length * 80,
 								height:dataHieght + titleHeight + offsety * 2,
 								class: 'graph'
-							})
+							});
 							/*.on({
 								"mousedown":function(){
 									console.log(d3.select(this)[0]);
 									d3.select(this).attr("opacity",0.7);},
 						    	"mouseup":function(){d3.select(this).attr("opacity",1.0);}
 						    })*/
-					
+
 					Bar.selectAll('rect')
 						.data(dataSet)
 						.enter()
@@ -888,7 +890,7 @@ $(function(){
 							},
 							y: dataHieght,
 							width: barWidth,
-							height: 0, 
+							height: 0,
 							transform: 'translate(40,' + titleHeight + ')',
 							class: 'rect'
 						})
@@ -896,16 +898,16 @@ $(function(){
 						.ease('cubic')
 						.attr({
 							y: function(d, i) {
-								return d < 0 ? dataHieght : dataHieght - d;	
+								return d < 0 ? dataHieght : dataHieght - d;
 							},
 							height: function(d, i) {
 								return d < 0 ? -d : d;
 							},
 							fill: function(d, i) {
-								return d < 0 ? 'blue' : 'red';	
+								return d < 0 ? 'blue' : 'red';
 							},
 							class:'hoge'
-						})
+						});
 					Bar.selectAll('text')
 						.data(dataSet)
 						.enter()
@@ -925,7 +927,7 @@ $(function(){
 								return 'white';
 							},
 							transform: 'translate(' + barWidth * 1.1  + ', 0)'
-						})
+						});
 
 					Bar.selectAll('settlement')
 						.data(settlement)
@@ -949,8 +951,8 @@ $(function(){
 						})
 						.text(function(d,i) {
 							return d;
-						})
-						
+						});
+
 					Bar.append('text')
 						.attr({
 							fill: 'none',
@@ -970,8 +972,8 @@ $(function(){
 							transform: 'translate(' + barWidth + ', 0)',
 							transform: 'scale(.6)'
 						})
-						.text(title)
-						
+						.text(title);
+
 					//if(!$('#title').text() || $('#title').children().length == 1) {
 					Bar.append('text')
 						.attr({
@@ -982,12 +984,12 @@ $(function(){
 							fill: 'gray',
 							transform: 'scale(.6)'
 						})
-						.text(company)
+						.text(company);
 					//}
 
 					var Yscale = d3.scale.linear()
 						.domain([ dataHieght, 0])
-						.range([ 0, dataHieght ])
+						.range([ 0, dataHieght ]);
 
 					Bar.append('g')
 						.attr({
@@ -1011,13 +1013,13 @@ $(function(){
 							x:0,
 							y:function(d,i) {
 								//すべての数値がマイナスの時だけ配置を変える
-								for(var i=0,n=dataSet.length;i<n;i++) {
-									if(dataSet[i] > 0) {return 0;}
+								for(var j=0,n=dataSet.length;j<n;j++) {
+									if(dataSet[j] > 0) {return 0;}
 								}
 								return dataHieght;
 							}
-						})
-					
+						});
+
 					erase(Bar,dataSet);
 				}
 //グラフ削除
@@ -1033,7 +1035,7 @@ function erase(svg,array) {
 				transform: 'scale(1)',
 				class: 'close'
 			})
-			.text('✖️')
+			.text('✖️');
 			$('.close').on('click', function() {
 				//console.log('close');
 				$(this).parent().remove();
@@ -1049,11 +1051,11 @@ function cPositon(i,array) {//i: 描画順, array: 描画要素のすべてを�
 	//console.log(r);
 	if(i == 1) { r +=array[i-1] * 2 + padding;}
 	if(i == 2) { r +=array[i-1] * 2 + array[i-2] * 2 +padding * 2;}
-	if(i == 3) { r +=array[i-1] * 2 + array[i-2] * 2 + array[i-3] * 2 + padding * 3}  
+	if(i == 3) { r +=array[i-1] * 2 + array[i-2] * 2 + array[i-3] * 2 + padding * 3;}
 	return r;
 }
 
-//D３circle exist
+//create circle graph
 function circle(array) {
 	console.log(array);
 	var title = array[2];
@@ -1061,7 +1063,7 @@ function circle(array) {
 	var dataSet = [];
 	var settlement = [];//決算期
 	var maxElement;//配列の最大値 最大円の半径
-	var Scale = .5;//描画倍率
+	var Scale = 0.5;//描画倍率
 	var fontSize = 10;
 	var textPositionX = [];
 	var textPositionY = [];
@@ -1074,10 +1076,10 @@ function circle(array) {
 	}
 	for (var i = 0; i < array[0].length; i++) {
 		dataSet.push(array[0][i] * Scale);
-	};
-	for (var i = 0; i < array[1].length; i++) {
-		settlement.push(array[1][i]);
-	};
+	}
+	for (var j = 0; j < array[1].length; j++) {
+		settlement.push(array[1][j]);
+	}
 	//console.log(dataSet,settlement);
 	var circle = d3.select('#data')
 				.append('svg')
@@ -1087,7 +1089,7 @@ function circle(array) {
 					width:dataSet.length * maxElement * 2,
 					height:maxElement * 2 * 1.1,
 					class:'graph'
-				})
+				});
 		circle.selectAll('circle')
 			.data(dataSet)
 			.enter()
@@ -1095,7 +1097,7 @@ function circle(array) {
 			.attr({
 				cx: function(d,i) {
 					return cPositon(i,dataSet);
-				}, 
+				},
 				cy: function(d,i) {
 					return maxElement + (maxElement -d);
 				},
@@ -1106,7 +1108,7 @@ function circle(array) {
 			.attr({
 				cx: function(d,i) {
 					return cPositon(i,dataSet);
-				}, 
+				},
 				cy: function(d,i) {
 					return maxElement + (maxElement -d);
 				},
@@ -1114,26 +1116,26 @@ function circle(array) {
 					return d ;
 				},
 				fill: 'rgba(0,0,0,.32)'
-			})
+			});
 		circle.selectAll('text')
 			.data(dataSet)
 			.enter()
 			.append('text')
 			.text(function(d,i) {
-				return (d *.1).toFixed(2) + '%';
+				return (d * 0.1).toFixed(2) + '%';
 			})
 			.attr({
 				x: function(d,i) {
 					//textPositionY.push(maxElement + i * maxElement * 2 - d *.3);
 					return cPositon(i,dataSet);
-				}, 
+				},
 				y: function(d,i) {
 					textPositionY.push(maxElement + (maxElement -d));
 					return (maxElement + (maxElement -d)).toFixed();
 				},
 				'font-size': fontSize,
 				fill: 'white'
-			})
+			});
 		circle.selectAll('settlement')
 			.data(settlement)
 			.enter()
@@ -1149,11 +1151,11 @@ function circle(array) {
 				stroke: 'gray',
 				'font-weight': 'bold',
 				'font-size': 9,
-				'stroke-width': .2
+				'stroke-width': 0.2
 			})
 			.text(function(d, i) {
 				return d;
-			})
+			});
 		circle.append('text')
 			.transition(1000)
 			.delay(1000)
@@ -1166,7 +1168,7 @@ function circle(array) {
 				'font-size': fontSize,
 				transform: 'translate(0,' + fontSize * 2 + ')'
 			})
-			.text(title)
+			.text(title);
 		circle.append('text')
 			.transition(1000)
 			.delay(800)
@@ -1179,6 +1181,6 @@ function circle(array) {
 				'font-size': fontSize,
 				transform: 'translate(0,' + fontSize + ')'
 			})
-			.text(company)
+			.text(company);
 			erase(circle,dataSet);
 		}

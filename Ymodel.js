@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+//var url = 'mongodb://localhost/kabu2';
 var url = 'mongodb://heroku_app35584595:t7itv7immno45qdjbkkv25cs1@ds061391.mongolab.com:61391/heroku_app35584595/kabu2';//
 var db = mongoose.createConnection(url, function(err, res) {
 	if(err) {
@@ -30,7 +31,7 @@ var YSchema = new mongoose.Schema({
 	'自己資本比率': String,
 	'ROA（総資産利益率）': String,
 	'ROE（自己資本利益率）': String,
-	'総資産経常利益率': String 
+	'総資産経常利益率': String
 }, {collection: 'YFinfo'});
 
 exports.Yahoo = db.model('Yahoo', YSchema);
