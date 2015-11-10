@@ -3,8 +3,6 @@ var http = require('http');
 var fs = require('fs');
 var request = require("request");
 var cheerio = require("cheerio");
-var Promise = require('es6-promise').Promise;
-var nimble = require('nimble');
 
 var model = require('../Ymodel.js');
 	Yahoo = model.Yahoo;
@@ -50,7 +48,7 @@ function scrape(currentticker, url) {
 	console.log(url,currentticker);
 	request({　uri: url },
 		function(err, res, body) {
-		
+
 		//DB挿入
 		var promise = new Promise(function(resolve,reject) {
 			//console.log(Obj);
@@ -60,7 +58,7 @@ function scrape(currentticker, url) {
 			} else {
 				return;
 			}
-			
+
 			//yahooファイナンスからのスクレイピング　別のサイトのスクレイピングをするときはyahooScrape()を別なものにすれば良い。
 			Obj = yahooScrape($);
 
@@ -97,17 +95,17 @@ function scrape(currentticker, url) {
 
 					//データベース格納
 					Yahoo.update(conditions, doc, options, function(err, data) {
-						//console.log(data);  //{ ok: 1, nModified: 0, n: 1 }
+						console.log(data);  //{ ok: 1, nModified: 0, n: 1 }
 					});
 				}
 			}
 			resolve('ok');
 		});
-		
+
 		//jsonファイル出力
 		promise.then(function(value){
 			Yahoo.find({"証券コード": currentticker}, function(err, data) {
-				//console.log(data); 		//jsonファイル生成前のデータの確認
+				console.log(data); 		//jsonファイル生成前のデータの確認
 				JSONFileGenerator(data);
 			});
 		});
@@ -161,7 +159,7 @@ function yahooScrape($) {
 			i % 4 == 0 ? settlement.splice(i,1): settlement[i] = settlement[i] ;
 		}
 		settlement = settlement.filter(function(element){return element !== undefined});
-		
+
 		//YFにプロパティを追記
 		var Obj =[['会社名','証券コード'],[company,ticker],[company,ticker],[company,ticker]];
 		for(var i=0,n=settlement.length;i<n;i++) {

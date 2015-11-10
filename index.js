@@ -6,9 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');//postを使うとき必須
 
-var routes = require('./routes/promise');
-//var users = require('./routes/users');
-//var promise = require('./routes/promise');
+var routes = require('./routes/index');
 
 var app = express();
 
@@ -26,8 +24,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-//app.use('/users', users);
-//app.use('/promise', promise);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
